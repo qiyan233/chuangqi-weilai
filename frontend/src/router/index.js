@@ -89,15 +89,35 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  const user = JSON.parse(localStorage.getItem('user') || 'null')
 
+  // 安全解析用户信息
+  let user = null
+  try {
+    user = JSON.parse(localStorage.getItem('user') || 'null')
+  } catch (e) {
+    console.warn('Failed to parse user from localStorage:', e)
+    localStorage.removeItem('user')
+  }
+
+  // 已登录用户访问登录/注册页时重定向到首页
+  if (token && (to.name === 'Login' || to.name === 'Register')) {
+    next({ name: 'Home' })
+    return
+  }
+
+  // 需要认证的页面但未登录
   if (to.meta.requiresAuth && !token) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (to.meta.role && user?.role !== to.meta.role) {
-    next({ name: 'Home' })
-  } else {
-    next()
+    return
   }
+
+  // 角色不匹配
+  if (to.meta.role && user?.role !== to.meta.role) {
+    next({ name: 'Home' })
+    return
+  }
+
+  next()
 })
 
 export default router

@@ -19,6 +19,8 @@ const stats = ref({
 // Canvas 粒子背景
 const canvasRef = ref(null)
 let animationId = null
+let resizeHandler = null
+let ctx = null
 
 onMounted(async () => {
   // 加载统计数据
@@ -31,28 +33,39 @@ onMounted(async () => {
 
   await nextTick()
 
-  // 初始化粒子背景
-  initParticles()
+  // 创建 gsap.context 用于限定动画作用域
+  ctx = gsap.context(() => {
+    // 初始化粒子背景
+    initParticles()
 
-  // Hero 动画
-  initHeroAnimations()
+    // Hero 动画
+    initHeroAnimations()
 
-  // 滚动动画
-  initScrollAnimations()
+    // 滚动动画
+    initScrollAnimations()
+  })
 })
 
 onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
-  ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+  // 移除 resize 事件监听器
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler)
+    resizeHandler = null
+  }
+  // 只清理当前组件的动画，不影响其他组件
+  if (ctx) {
+    ctx.revert()
+  }
 })
 
 function initParticles() {
   const canvas = canvasRef.value
   if (!canvas) return
 
-  const ctx = canvas.getContext('2d')
+  const canvasCtx = canvas.getContext('2d')
   let particles = []
   const particleCount = 80
 
@@ -62,6 +75,8 @@ function initParticles() {
   }
 
   resize()
+  // 保存 resize handler 引用以便清理
+  resizeHandler = resize
   window.addEventListener('resize', resize)
 
   // 创建粒子
@@ -77,7 +92,7 @@ function initParticles() {
   }
 
   function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
 
     particles.forEach((p) => {
       p.x += p.vx
@@ -86,10 +101,10 @@ function initParticles() {
       if (p.x < 0 || p.x > canvas.width) p.vx *= -1
       if (p.y < 0 || p.y > canvas.height) p.vy *= -1
 
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(233, 69, 96, ${p.opacity})`
-      ctx.fill()
+      canvasCtx.beginPath()
+      canvasCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+      canvasCtx.fillStyle = `rgba(233, 69, 96, ${p.opacity})`
+      canvasCtx.fill()
     })
 
     // 连接相邻粒子
@@ -100,12 +115,12 @@ function initParticles() {
         const dist = Math.sqrt(dx * dx + dy * dy)
 
         if (dist < 150) {
-          ctx.beginPath()
-          ctx.moveTo(p1.x, p1.y)
-          ctx.lineTo(p2.x, p2.y)
-          ctx.strokeStyle = `rgba(233, 69, 96, ${0.1 * (1 - dist / 150)})`
-          ctx.lineWidth = 0.5
-          ctx.stroke()
+          canvasCtx.beginPath()
+          canvasCtx.moveTo(p1.x, p1.y)
+          canvasCtx.lineTo(p2.x, p2.y)
+          canvasCtx.strokeStyle = `rgba(233, 69, 96, ${0.1 * (1 - dist / 150)})`
+          canvasCtx.lineWidth = 0.5
+          canvasCtx.stroke()
         }
       })
     })

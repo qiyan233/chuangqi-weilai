@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 export function useLenis() {
   const lenis = ref(null)
   const scrollProgress = ref(0)
+  let tickerCallback = null
 
   onMounted(() => {
     // 初始化 Lenis
@@ -22,9 +23,11 @@ export function useLenis() {
     // 与 GSAP ScrollTrigger 集成
     lenis.value.on('scroll', ScrollTrigger.update)
 
-    gsap.ticker.add((time) => {
+    // 保存 ticker 回调引用以便清理
+    tickerCallback = (time) => {
       lenis.value.raf(time * 1000)
-    })
+    }
+    gsap.ticker.add(tickerCallback)
 
     gsap.ticker.lagSmoothing(0)
 
@@ -35,8 +38,14 @@ export function useLenis() {
   })
 
   onUnmounted(() => {
+    // 移除 gsap.ticker 回调
+    if (tickerCallback) {
+      gsap.ticker.remove(tickerCallback)
+      tickerCallback = null
+    }
     if (lenis.value) {
       lenis.value.destroy()
+      lenis.value = null
     }
   })
 

@@ -7,8 +7,12 @@ gsap.registerPlugin(ScrollTrigger)
 
 export function useGsap() {
   const ctx = gsap.context(() => {})
+  const cleanupFns = []
 
   onUnmounted(() => {
+    // 清理所有手动注册的事件监听器
+    cleanupFns.forEach(fn => fn())
+    cleanupFns.length = 0
     ctx.revert()
   })
 
@@ -105,28 +109,26 @@ export function useGsap() {
 
   // 鼠标视差效果
   function mouseParallax(selector, intensity = 0.1) {
-    ctx.add(() => {
-      const el = document.querySelector(selector)
-      if (!el) return
+    const el = document.querySelector(selector)
+    if (!el) return
 
-      const handleMouseMove = (e) => {
-        const { clientX, clientY } = e
-        const centerX = window.innerWidth / 2
-        const centerY = window.innerHeight / 2
-        const moveX = (clientX - centerX) * intensity
-        const moveY = (clientY - centerY) * intensity
+    const handleMouseMove = (e) => {
+      const { clientX, clientY } = e
+      const centerX = window.innerWidth / 2
+      const centerY = window.innerHeight / 2
+      const moveX = (clientX - centerX) * intensity
+      const moveY = (clientY - centerY) * intensity
 
-        gsap.to(el, {
-          x: moveX,
-          y: moveY,
-          duration: 0.8,
-          ease: 'power2.out',
-        })
-      }
+      gsap.to(el, {
+        x: moveX,
+        y: moveY,
+        duration: 0.8,
+        ease: 'power2.out',
+      })
+    }
 
-      window.addEventListener('mousemove', handleMouseMove)
-      return () => window.removeEventListener('mousemove', handleMouseMove)
-    })
+    window.addEventListener('mousemove', handleMouseMove)
+    cleanupFns.push(() => window.removeEventListener('mousemove', handleMouseMove))
   }
 
   // 固定元素滚动动画

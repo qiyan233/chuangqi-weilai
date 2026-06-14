@@ -17,7 +17,9 @@ spring:
 
 # JWT 配置
 jwt:
-  secret: startup-incubator-secret-key-2026-very-long-secret
+  # 生产环境必须通过环境变量 JWT_SECRET 设置密钥
+  # 当前为开发默认值，生产环境务必替换
+  secret: ${JWT_SECRET:dev-only-please-set-JWT_SECRET-env-var-in-production-2026}
   expiration: 86400000  # 24小时
 
 # 文件上传路径

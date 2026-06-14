@@ -30,7 +30,9 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRole(User.UserRole.valueOf(request.getRole()));
+        // 安全修复：忽略客户端传入的 role，强制注册为 ENTREPRENEUR
+        // 只有管理员才能提升用户角色
+        user.setRole(User.UserRole.ENTREPRENEUR);
         user.setRealName(request.getRealName());
         user.setPhone(request.getPhone());
         user.setCity(request.getCity());

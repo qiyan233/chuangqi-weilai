@@ -48,15 +48,13 @@ public class SecurityConfig {
             }))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // 公开接口
                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                 .requestMatchers("/api/projects/approved").permitAll()
-                .requestMatchers("/api/projects/{id}").permitAll()
                 .requestMatchers("/api/stats/**").permitAll()
+                // 管理员接口 - 统一前缀
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
-                .requestMatchers("/api/projects/*/review").hasRole("ADMIN")
-                .requestMatchers("/api/applications/*/review").hasRole("ADMIN")
-                .requestMatchers("/api/applications").hasRole("ADMIN")
+                // 其他接口需要认证
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

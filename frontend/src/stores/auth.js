@@ -4,7 +4,16 @@ import api from '@/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || '')
-  const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+
+  // 安全解析 JSON，防止 localStorage 数据损坏导致应用崩溃
+  let parsedUser = null
+  try {
+    parsedUser = JSON.parse(localStorage.getItem('user') || 'null')
+  } catch (e) {
+    console.warn('Failed to parse user from localStorage:', e)
+    localStorage.removeItem('user')
+  }
+  const user = ref(parsedUser)
 
   const isAuthenticated = computed(() => !!token.value)
   const isEntrepreneur = computed(() => user.value?.role === 'ENTREPRENEUR')

@@ -29,6 +29,10 @@ public class ProjectController {
     @GetMapping("/{id}")
     public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
         Project project = projectService.getProjectById(id);
+        // 公开接口只返回已审核通过的项目
+        if (project.getStatus() != Project.ProjectStatus.APPROVED) {
+            throw new RuntimeException("项目不存在或未审核通过");
+        }
         return ResponseEntity.ok(project);
     }
 
@@ -72,20 +76,5 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    // 管理员审核项目
-    @PutMapping("/{id}/review")
-    public ResponseEntity<Project> reviewProject(
-            @PathVariable Long id,
-            @RequestParam String status,
-            @RequestParam(required = false) String reviewNotes) {
-        Project reviewed = projectService.reviewProject(id, status, reviewNotes);
-        return ResponseEntity.ok(reviewed);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        Map<String, String> error = new HashMap<>();
-        error.put("message", e.getMessage());
-        return ResponseEntity.badRequest().body(error);
-    }
+    // 注意：管理员审核接口已移至 AdminController (/api/admin/projects/{id}/review)
 }

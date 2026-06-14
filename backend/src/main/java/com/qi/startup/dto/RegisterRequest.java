@@ -2,6 +2,7 @@ package com.qi.startup.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class RegisterRequest {
     private String password;
 
     @NotBlank(message = "角色不能为空")
+    @Pattern(regexp = "^(ENTREPRENEUR|INVESTOR)$", message = "角色只能是 ENTREPRENEUR 或 INVESTOR")
     private String role; // ENTREPRENEUR, INVESTOR
 
     private String realName;
