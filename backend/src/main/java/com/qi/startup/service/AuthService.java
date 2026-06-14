@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -90,5 +93,42 @@ public class AuthService {
             user.getPhone(),
             user.getCity()
         );
+    }
+
+    // 初始化管理员账号（仅在没有管理员时可用）
+    public Map<String, Object> initAdmin() {
+        // 检查是否已有管理员
+        long adminCount = userRepository.countByRole(User.UserRole.ADMIN);
+        if (adminCount > 0) {
+            throw new RuntimeException("管理员账号已存在，无法重复初始化");
+        }
+
+        // 创建管理员账号
+        User admin = new User();
+        admin.setUsername("admin");
+        admin.setEmail("admin@chuangqi.com");
+        admin.setPasswordHash(passwordEncoder.encode("admin123"));
+        admin.setRole(User.UserRole.ADMIN);
+        admin.setRealName("系统管理员");
+
+        userRepository.save(admin);
+
+        // 生成 token
+        String token = jwtUtil.generateToken(admin.getId(), admin.getUsername(), admin.getRole().name());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "管理员账号初始化成功");
+        response.put("token", token);
+        response.put("user", new AuthResponse.UserDto(
+            admin.getId(),
+            admin.getUsername(),
+            admin.getEmail(),
+            admin.getRole().name(),
+            admin.getRealName(),
+            admin.getPhone(),
+            admin.getCity()
+        ));
+
+        return response;
     }
 }

@@ -16,48 +16,55 @@ const loading = ref(false)
 const error = ref('')
 
 onMounted(() => {
-  // 入场动画
+  // 入场动画 - 使用 set + to 模式避免 from 动画导致的可见性问题
   const tl = gsap.timeline()
 
-  tl.from('.login-container', {
-    y: 50,
+  // 先设置初始状态
+  gsap.set(['.login-container', '.login-header h1', '.login-header p', '.form-group', '.login-btn', '.login-footer'], {
     opacity: 0,
+    y: 30,
+  })
+
+  // 然后执行入场动画
+  tl.to('.login-container', {
+    opacity: 1,
+    y: 0,
     duration: 0.8,
     ease: 'power3.out',
   })
 
-  tl.from('.login-header h1', {
-    y: 30,
-    opacity: 0,
+  tl.to('.login-header h1', {
+    opacity: 1,
+    y: 0,
     duration: 0.6,
     ease: 'power2.out',
   }, '-=0.4')
 
-  tl.from('.login-header p', {
-    y: 20,
-    opacity: 0,
+  tl.to('.login-header p', {
+    opacity: 1,
+    y: 0,
     duration: 0.5,
     ease: 'power2.out',
   }, '-=0.3')
 
-  tl.from('.form-group', {
-    y: 30,
-    opacity: 0,
+  tl.to('.form-group', {
+    opacity: 1,
+    y: 0,
     duration: 0.5,
     stagger: 0.1,
     ease: 'power2.out',
   }, '-=0.2')
 
-  tl.from('.login-btn', {
-    y: 20,
-    opacity: 0,
+  tl.to('.login-btn', {
+    opacity: 1,
+    y: 0,
     duration: 0.5,
     ease: 'power2.out',
   }, '-=0.2')
 
-  tl.from('.login-footer', {
-    y: 20,
-    opacity: 0,
+  tl.to('.login-footer', {
+    opacity: 1,
+    y: 0,
     duration: 0.5,
     ease: 'power2.out',
   }, '-=0.2')

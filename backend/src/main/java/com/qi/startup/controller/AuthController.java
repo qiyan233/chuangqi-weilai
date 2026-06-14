@@ -39,6 +39,12 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+    // 初始化管理员账号（仅在没有管理员时可用）
+    @PostMapping("/init-admin")
+    public ResponseEntity<Map<String, Object>> initAdmin() {
+        return ResponseEntity.ok(authService.initAdmin());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
         Map<String, String> error = new HashMap<>();

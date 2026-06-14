@@ -21,41 +21,49 @@ const loading = ref(false)
 const error = ref('')
 
 onMounted(() => {
-  // 入场动画
+  // 入场动画 - 使用 set + to 模式避免 from 动画导致的可见性问题
   const tl = gsap.timeline()
 
-  tl.from('.register-container', {
-    y: 50,
+  // 先设置初始状态
+  gsap.set(['.register-container', '.register-header h1', '.register-header p', '.role-btn', '.form-group'], {
     opacity: 0,
+    y: 30,
+  })
+
+  // 然后执行入场动画
+  tl.to('.register-container', {
+    opacity: 1,
+    y: 0,
     duration: 0.8,
     ease: 'power3.out',
   })
 
-  tl.from('.register-header h1', {
-    y: 30,
-    opacity: 0,
+  tl.to('.register-header h1', {
+    opacity: 1,
+    y: 0,
     duration: 0.6,
     ease: 'power2.out',
   }, '-=0.4')
 
-  tl.from('.register-header p', {
-    y: 20,
-    opacity: 0,
+  tl.to('.register-header p', {
+    opacity: 1,
+    y: 0,
     duration: 0.5,
     ease: 'power2.out',
   }, '-=0.3')
 
-  tl.from('.role-btn', {
-    scale: 0.8,
-    opacity: 0,
+  tl.to('.role-btn', {
+    opacity: 1,
+    y: 0,
+    scale: 1,
     duration: 0.5,
     stagger: 0.15,
     ease: 'back.out(1.7)',
   }, '-=0.2')
 
-  tl.from('.form-group', {
-    y: 30,
-    opacity: 0,
+  tl.to('.form-group', {
+    opacity: 1,
+    y: 0,
     duration: 0.5,
     stagger: 0.1,
     ease: 'power2.out',

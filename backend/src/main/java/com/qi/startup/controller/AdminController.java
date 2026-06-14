@@ -1,5 +1,6 @@
 package com.qi.startup.controller;
 
+import com.qi.startup.dto.ReviewRequest;
 import com.qi.startup.model.Application;
 import com.qi.startup.model.Project;
 import com.qi.startup.model.User;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,9 +67,8 @@ public class AdminController {
     @PutMapping("/projects/{id}/review")
     public ResponseEntity<Map<String, Object>> reviewProject(
             @PathVariable Long id,
-            @RequestParam String status,
-            @RequestParam(required = false) String reviewNotes) {
-        Project project = projectService.reviewProject(id, status, reviewNotes);
+            @RequestBody ReviewRequest request) {
+        Project project = projectService.reviewProject(id, request.getStatus(), request.getReviewNotes());
         return ResponseEntity.ok(toProjectRow(project));
     }
 
@@ -83,11 +84,10 @@ public class AdminController {
     @PutMapping("/applications/{id}/review")
     public ResponseEntity<Map<String, Object>> reviewApplication(
             @PathVariable Long id,
-            @RequestParam String status,
-            @RequestParam(required = false) String reviewNotes,
-            HttpServletRequest request) {
-        Long reviewerId = (Long) request.getAttribute("userId");
-        Application application = applicationService.reviewApplication(id, status, reviewNotes, reviewerId);
+            @RequestBody ReviewRequest request,
+            HttpServletRequest httpRequest) {
+        Long reviewerId = (Long) httpRequest.getAttribute("userId");
+        Application application = applicationService.reviewApplication(id, request.getStatus(), request.getReviewNotes(), reviewerId);
         return ResponseEntity.ok(toApplicationRow(application));
     }
 

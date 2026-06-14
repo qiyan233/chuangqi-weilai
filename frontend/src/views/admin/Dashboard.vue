@@ -95,17 +95,18 @@ onMounted(async () => {
 
   // 获取仪表盘数据
   try {
-    const res = await api.get('/admin/dashboard')
+    const res = await api.get('/admin/stats')
     if (res.data) {
       stats.value = {
         totalUsers: res.data.totalUsers ?? 0,
         totalProjects: res.data.totalProjects ?? 0,
-        pendingReviews: res.data.pendingReviews ?? 0,
+        pendingReviews: res.data.pendingProjects ?? 0,
         totalApplications: res.data.totalApplications ?? 0,
       }
     }
   } catch (err) {
-    error.value = err.response?.data?.message || '数据加载失败，请稍后重试'
+    console.error('Dashboard load error:', err)
+    error.value = err.response?.data?.error || err.response?.data?.message || '数据加载失败，请稍后重试'
   } finally {
     loading.value = false
   }

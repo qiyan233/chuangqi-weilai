@@ -67,7 +67,10 @@ async function handleSubmit() {
   success.value = ''
 
   try {
+    console.log('开始提交申请...')
+
     // 创建项目
+    console.log('1. 创建项目...')
     const projectResponse = await api.post('/projects', {
       name: form.value.name,
       industry: form.value.industry,
@@ -88,24 +91,43 @@ async function handleSubmit() {
       equityPercent: form.value.equityPercent,
       fundUsage: form.value.fundUsage,
     })
+    console.log('项目创建成功:', projectResponse.data)
 
     // 创建入驻申请
-    await api.post('/applications', {
+    console.log('2. 创建入驻申请...')
+    const appResponse = await api.post('/applications', {
       projectId: projectResponse.data.id,
       teamMembers: form.value.teamMembers,
       equityStructure: form.value.equityStructure,
       teamTags: JSON.stringify(form.value.teamTags),
     })
+    console.log('申请创建成功:', appResponse.data)
 
     // 提交项目审核
-    await api.post(`/projects/${projectResponse.data.id}/submit`)
+    console.log('3. 提交项目审核...')
+    const submitResponse = await api.post(`/projects/${projectResponse.data.id}/submit`)
+    console.log('项目提交审核成功:', submitResponse.data)
 
     success.value = '申请已提交！我们的团队将在3个工作日内与您联系。'
     setTimeout(() => {
       router.push('/startup/dashboard')
     }, 2000)
   } catch (err) {
-    error.value = err.response?.data?.message || '提交失败，请重试'
+    console.error('提交失败详细错误:', err)
+    console.error('错误响应:', err.response?.data)
+    console.error('错误状态:', err.response?.status)
+    console.error('错误头:', err.response?.headers)
+
+    // 显示详细的错误信息
+    const errorData = err.response?.data
+    if (errorData) {
+      // 后端返回的错误可能是 error 或 message 字段
+      error.value = errorData.error || errorData.message || JSON.stringify(errorData)
+    } else if (err.message) {
+      error.value = err.message
+    } else {
+      error.value = '提交失败，请重试'
+    }
   } finally {
     loading.value = false
   }

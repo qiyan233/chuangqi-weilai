@@ -301,7 +301,19 @@ const mentors = [
 /* Mentors */
 .mentors-section {
   background: var(--ink);
-  padding: 5rem 4rem;
+  padding: 5rem 4rem 6rem;
+  position: relative;
+}
+
+/* 添加底部渐变分隔线 */
+.mentors-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, rgba(233, 69, 96, 0.3) 20%, var(--accent) 50%, rgba(233, 69, 96, 0.3) 80%, transparent 100%);
 }
 
 .mentors-container {
@@ -405,7 +417,7 @@ const mentors = [
   }
 
   .mentors-section {
-    padding: 3rem 1.5rem;
+    padding: 3rem 1.5rem 4rem;
   }
 
   .mentors-grid {

@@ -75,7 +75,7 @@ onUnmounted(() => {
     <div class="nav-actions">
       <template v-if="authStore.isAuthenticated">
         <router-link
-          :to="authStore.isEntrepreneur ? '/startup/dashboard' : '/investor/dashboard'"
+          :to="authStore.isAdmin ? '/admin' : (authStore.isEntrepreneur ? '/startup/dashboard' : '/investor/dashboard')"
           class="nav-dashboard"
           data-cursor
         >
