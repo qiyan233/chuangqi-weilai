@@ -32,6 +32,13 @@ public class ProjectService {
         return projectRepository.findByUser(user);
     }
 
+    public List<Project> getAllProjects(String status) {
+        if (status == null || status.isBlank()) {
+            return projectRepository.findAll();
+        }
+        return projectRepository.findByStatus(Project.ProjectStatus.valueOf(status));
+    }
+
     @Transactional
     public Project createProject(Long userId, Project project) {
         User user = userRepository.findById(userId)
@@ -117,5 +124,17 @@ public class ProjectService {
 
     public long getApprovedProjectCount() {
         return projectRepository.countByStatus(Project.ProjectStatus.APPROVED);
+    }
+
+    public long getTotalProjectCount() {
+        return projectRepository.count();
+    }
+
+    public long getPendingProjectCount() {
+        return projectRepository.countByStatus(Project.ProjectStatus.PENDING);
+    }
+
+    public long getRejectedProjectCount() {
+        return projectRepository.countByStatus(Project.ProjectStatus.REJECTED);
     }
 }

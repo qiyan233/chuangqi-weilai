@@ -23,23 +23,26 @@ function logout() {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
 
-  // 导航栏入场动画
-  gsap.from(navRef.value, {
-    y: -100,
-    opacity: 0,
+  // 导航栏入场动画 — 使用 set + to 避免 from 动画卡住
+  gsap.set(navRef.value, { y: -100, opacity: 0 })
+  gsap.set('.nav-links li', { y: -20, opacity: 0 })
+
+  gsap.to(navRef.value, {
+    y: 0,
+    opacity: 1,
     duration: 1,
     ease: 'power3.out',
-    delay: 0.5,
+    delay: 0.3,
   })
 
   // 导航链接交错动画
-  gsap.from('.nav-links li', {
-    y: -20,
-    opacity: 0,
+  gsap.to('.nav-links li', {
+    y: 0,
+    opacity: 1,
     duration: 0.6,
     stagger: 0.1,
     ease: 'power2.out',
-    delay: 0.8,
+    delay: 0.5,
   })
 })
 
@@ -98,25 +101,28 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
 }
 
 .nav.scrolled {
-  background: rgba(26, 26, 46, 0.95);
-  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(26, 26, 46, 0.9);
+  backdrop-filter: blur(30px) saturate(180%);
   padding: 1rem 4rem;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .nav-logo {
   font-family: 'Noto Serif SC', serif;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: white;
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   transition: transform 0.3s ease;
+  letter-spacing: 0.03em;
 }
 
 .nav-logo:hover {
@@ -179,11 +185,12 @@ onUnmounted(() => {
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(233, 69, 96, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent 70%);
   border-radius: 50%;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translate(-50%, -50%);
   z-index: -1;
+  pointer-events: none;
 }
 
 .nav-links a:hover::after {
@@ -215,7 +222,7 @@ onUnmounted(() => {
 .nav-cta {
   background: var(--accent);
   color: white;
-  padding: 0.6rem 1.5rem;
+  padding: 0.55rem 1.4rem;
   border-radius: 30px;
   text-decoration: none;
   font-size: 0.85rem;
@@ -223,6 +230,8 @@ onUnmounted(() => {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+  letter-spacing: 0.02em;
 }
 
 .nav-cta::before {
@@ -338,5 +347,10 @@ onUnmounted(() => {
     background: rgba(26, 26, 46, 0.98);
     padding: 1rem 2rem;
   }
+}
+
+/* Nav entrance safety — ensure visibility even if GSAP delays */
+.app-nav {
+  will-change: transform, opacity;
 }
 </style>

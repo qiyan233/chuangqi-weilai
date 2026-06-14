@@ -5,9 +5,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 onMounted(() => {
   // 页脚渐入动画
-  gsap.from('.footer', {
-    opacity: 0,
-    y: 50,
+  // Footer entrance — set+to pattern
+  gsap.set('.footer', { opacity: 0, y: 50 })
+  gsap.set('.footer-col', { opacity: 0, y: 30 })
+
+  gsap.to('.footer', {
+    opacity: 1,
+    y: 0,
     duration: 1,
     ease: 'power3.out',
     scrollTrigger: {
@@ -17,10 +21,10 @@ onMounted(() => {
     },
   })
 
-  // 列交错动画
-  gsap.from('.footer-col', {
-    opacity: 0,
-    y: 30,
+  // Column stagger animation
+  gsap.to('.footer-col', {
+    opacity: 1,
+    y: 0,
     duration: 0.8,
     stagger: 0.15,
     ease: 'power2.out',
@@ -92,9 +96,9 @@ onMounted(() => {
 
 <style scoped>
 .footer {
-  background: #0f0f1a;
-  padding: 6rem 4rem 4rem;
-  color: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(180deg, #0f0f1a 0%, #0a0a14 100%);
+  padding: 6rem 4rem 3rem;
+  color: rgba(255, 255, 255, 0.55);
   position: relative;
   overflow: hidden;
 }
@@ -105,8 +109,8 @@ onMounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(233, 69, 96, 0.3) 20%, var(--accent) 50%, rgba(233, 69, 96, 0.3) 80%, transparent 100%);
 }
 
 .footer-grid {
@@ -146,18 +150,19 @@ onMounted(() => {
 }
 
 .social-link {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .social-link:hover {
@@ -227,12 +232,13 @@ onMounted(() => {
 }
 
 .badge {
-  padding: 0.3rem 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.35rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.05em;
   transition: all 0.3s ease;
 }
 

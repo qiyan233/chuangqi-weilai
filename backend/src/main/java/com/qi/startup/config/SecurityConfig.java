@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -47,6 +52,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/projects/approved").permitAll()
                 .requestMatchers("/api/projects/{id}").permitAll()
                 .requestMatchers("/api/stats/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/projects/*/review").hasRole("ADMIN")
+                .requestMatchers("/api/applications/*/review").hasRole("ADMIN")
+                .requestMatchers("/api/applications").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -80,6 +89,13 @@ public class SecurityConfig {
                     request.setAttribute("userId", userId);
                     request.setAttribute("username", username);
                     request.setAttribute("role", role);
+
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                        var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                        var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             }
 

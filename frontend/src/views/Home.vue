@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { nextTick, ref, onMounted, onUnmounted } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import api from '@/api'
@@ -28,6 +28,8 @@ onMounted(async () => {
   } catch (error) {
     console.error('加载统计数据失败:', error)
   }
+
+  await nextTick()
 
   // 初始化粒子背景
   initParticles()
@@ -115,34 +117,48 @@ function initParticles() {
 }
 
 function initHeroAnimations() {
-  const tl = gsap.timeline({ delay: 0.5 })
+  // 先设置所有动画元素的初始隐藏状态（使用 set + to 模式避免 from 动画卡住）
+  gsap.set(['.hero-title .line', '.hero-subtitle', '.hero-buttons a', '.orbit', '.orbit-node', '.center-hub'], {
+    opacity: 0,
+  })
+  gsap.set('.hero-title .line', { y: 100 })
+  gsap.set('.hero-subtitle', { y: 30 })
+  gsap.set('.hero-buttons a', { y: 30 })
+  gsap.set('.hero-title .highlight', { backgroundSize: '0% 100%' })
+  gsap.set('.orbit-node', { scale: 0 })
+  gsap.set('.center-hub', { scale: 0 })
+
+  const tl = gsap.timeline({ delay: 0.3 })
 
   // 标题动画
-  tl.from('.hero-title .line', {
-    y: 100,
-    opacity: 0,
+  tl.to('.hero-title .line', {
+    y: 0,
+    opacity: 1,
     duration: 1,
     stagger: 0.2,
     ease: 'power3.out',
   })
 
   // 高亮文字动画
-  tl.from(
+  tl.to(
     '.hero-title .highlight',
     {
-      backgroundSize: '0% 100%',
+      backgroundSize: '100% 100%',
       duration: 0.8,
       ease: 'power2.inOut',
+      onComplete: () => {
+        document.querySelector('.hero-title .highlight')?.classList.add('revealed')
+      },
     },
     '-=0.5'
   )
 
   // 副标题动画
-  tl.from(
+  tl.to(
     '.hero-subtitle',
     {
-      y: 30,
-      opacity: 0,
+      y: 0,
+      opacity: 1,
       duration: 0.8,
       ease: 'power2.out',
     },
@@ -150,11 +166,11 @@ function initHeroAnimations() {
   )
 
   // 按钮动画
-  tl.from(
+  tl.to(
     '.hero-buttons a',
     {
-      y: 30,
-      opacity: 0,
+      y: 0,
+      opacity: 1,
       duration: 0.6,
       stagger: 0.15,
       ease: 'power2.out',
@@ -162,25 +178,24 @@ function initHeroAnimations() {
     '-=0.3'
   )
 
-  // 轨道动画
-  tl.from(
+  // 轨道动画 — 只动画 opacity，不碰 transform（CSS animation 控制旋转）
+  tl.to(
     '.orbit',
     {
-      scale: 0,
-      opacity: 0,
+      opacity: 1,
       duration: 1,
       stagger: 0.2,
-      ease: 'back.out(1.7)',
+      ease: 'power2.out',
     },
     '-=0.8'
   )
 
   // 轨道节点动画
-  tl.from(
+  tl.to(
     '.orbit-node',
     {
-      scale: 0,
-      opacity: 0,
+      scale: 1,
+      opacity: 1,
       duration: 0.5,
       stagger: 0.1,
       ease: 'back.out(1.7)',
@@ -189,11 +204,11 @@ function initHeroAnimations() {
   )
 
   // 中心枢纽动画
-  tl.from(
+  tl.to(
     '.center-hub',
     {
-      scale: 0,
-      opacity: 0,
+      scale: 1,
+      opacity: 1,
       duration: 0.8,
       ease: 'elastic.out(1, 0.5)',
     },
@@ -202,91 +217,57 @@ function initHeroAnimations() {
 }
 
 function initScrollAnimations() {
-  // 统计数字动画
-  gsap.from('.stat-item h3', {
-    textContent: 0,
-    duration: 2,
-    ease: 'power1.out',
-    snap: { textContent: 1 },
+  // Section header scroll reveals
+  gsap.from('.section-header', {
+    y: 40,
+    opacity: 0,
+    duration: 0.8,
+    ease: 'power3.out',
     scrollTrigger: {
-      trigger: '.stats-bar',
-      start: 'top 80%',
+      trigger: '.section-header',
+      start: 'top 85%',
       toggleActions: 'play none none reverse',
-    },
-    stagger: 0.2,
-    onUpdate: function () {
-      // 保持原始格式
     },
   })
 
-  // 统计卡片渐入
-  gsap.from('.stat-item', {
-    y: 60,
-    opacity: 0,
-    duration: 0.8,
-    stagger: 0.15,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: '.stats-bar',
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
-    },
+  // 统计数字动画 — 使用 countUp 方式从 0 滚动到实际数值
+  document.querySelectorAll('.stat-item h3').forEach(el => {
+    const rawText = el.textContent.replace(/[^0-9一-龥]/g, '')
+    // 如果包含中文（如"5亿"），跳过 countUp，保留原始文本
+    if (/[一-龥]/.test(rawText)) return
+
+    const target = parseInt(el.getAttribute('data-target') || el.textContent.replace(/[^0-9]/g, '')) || 200
+    if (target <= 0) return
+
+    const obj = { value: 0 }
+    gsap.to(obj, {
+      value: target,
+      duration: 2.5,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.stats-bar',
+        start: 'top 80%',
+        toggleActions: 'play none none reverse',
+      },
+      onUpdate: () => {
+        el.textContent = Math.floor(obj.value).toLocaleString()
+      },
+    })
   })
+
+  revealOnScroll('.stat-item', '.stats-bar', { y: 60, stagger: 0.15 })
 
   // 角色卡片动画
-  gsap.from('.role-card', {
-    y: 80,
-    opacity: 0,
-    duration: 0.8,
-    stagger: 0.15,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: '.roles-grid',
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
-    },
-  })
+  revealOnScroll('.role-card', '.roles-grid', { y: 80, stagger: 0.15 })
 
   // 流程步骤动画
-  gsap.from('.step', {
-    y: 60,
-    opacity: 0,
-    duration: 0.6,
-    stagger: 0.1,
-    ease: 'power2.out',
-    scrollTrigger: {
-      trigger: '.process-steps',
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
-    },
-  })
+  revealOnScroll('.step', '.process-steps', { y: 60, stagger: 0.1, duration: 0.6, ease: 'power2.out' })
 
   // 工具卡片动画
-  gsap.from('.tool-card', {
-    y: 60,
-    opacity: 0,
-    duration: 0.6,
-    stagger: 0.1,
-    ease: 'power2.out',
-    scrollTrigger: {
-      trigger: '.tools-grid',
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
-    },
-  })
+  revealOnScroll('.tool-card', '.tools-grid', { y: 60, stagger: 0.1, duration: 0.6, ease: 'power2.out' })
 
   // CTA 动画
-  gsap.from('.cta-content', {
-    y: 60,
-    opacity: 0,
-    duration: 1,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: '.cta-section',
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
-    },
-  })
+  revealOnScroll('.cta-content', '.cta-section', { y: 60, duration: 1 })
 
   // 视差效果 - Hero 背景
   gsap.to('.hero-grid', {
@@ -311,6 +292,37 @@ function initScrollAnimations() {
       scrub: true,
     },
   })
+}
+
+function revealOnScroll(selector, trigger, options = {}) {
+  const elements = gsap.utils.toArray(selector)
+  if (!elements.length) return
+
+  gsap.set(elements, {
+    clearProps: 'opacity,visibility,transform',
+  })
+
+  gsap.fromTo(
+    elements,
+    {
+      autoAlpha: 0,
+      y: options.y ?? 60,
+    },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: options.duration ?? 0.8,
+      stagger: options.stagger ?? 0,
+      ease: options.ease ?? 'power3.out',
+      immediateRender: false,
+      scrollTrigger: {
+        trigger,
+        start: 'top 85%',
+        once: true,
+        invalidateOnRefresh: true,
+      },
+    }
+  )
 }
 
 // 鼠标视差效果
@@ -398,7 +410,7 @@ function handleMouseMove(e) {
     <section class="stats-bar">
       <div class="stats-grid">
         <div class="stat-item">
-          <h3 class="stat-number">{{ stats.approvedProjects }}</h3>
+          <h3 class="stat-number" :data-target="stats.approvedProjects">{{ stats.approvedProjects }}</h3>
           <span class="stat-suffix">+</span>
           <p>在孵创业项目</p>
         </div>
@@ -409,12 +421,12 @@ function handleMouseMove(e) {
           <p>累计融资总额</p>
         </div>
         <div class="stat-item">
-          <h3 class="stat-number">{{ stats.partnerInvestors }}</h3>
+          <h3 class="stat-number" :data-target="stats.partnerInvestors">{{ stats.partnerInvestors }}</h3>
           <span class="stat-suffix">+</span>
           <p>合作投资机构</p>
         </div>
         <div class="stat-item">
-          <h3 class="stat-number">{{ stats.mentors }}</h3>
+          <h3 class="stat-number" :data-target="stats.mentors">{{ stats.mentors }}</h3>
           <span class="stat-suffix">+</span>
           <p>资深创业导师</p>
         </div>
@@ -585,20 +597,41 @@ function handleMouseMove(e) {
 }
 
 .hero-title .highlight {
-  color: var(--accent);
-  background-image: linear-gradient(var(--accent), var(--accent));
+  color: white;
+  background-image: linear-gradient(180deg, transparent 55%, rgba(233, 69, 96, 0.5) 55%);
   background-size: 100% 100%;
   background-position: left bottom;
   background-repeat: no-repeat;
-  padding-bottom: 0.2em;
+  padding-bottom: 0.15em;
+  display: inline-block;
+  position: relative;
+}
+
+.hero-title .highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-title .highlight.revealed::after {
+  transform: scaleX(1);
 }
 
 .hero-subtitle {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.8;
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 2;
   margin-bottom: 2.5rem;
-  max-width: 500px;
+  max-width: 520px;
+  letter-spacing: 0.02em;
 }
 
 .hero-buttons {
@@ -610,17 +643,19 @@ function handleMouseMove(e) {
 .btn-primary {
   background: var(--accent);
   color: white;
-  padding: 1rem 2.5rem;
+  padding: 0.95rem 2.2rem;
   border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   position: relative;
   overflow: hidden;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
 }
 
 .btn-primary::before {
@@ -647,16 +682,18 @@ function handleMouseMove(e) {
 .btn-secondary {
   background: transparent;
   color: white;
-  padding: 1rem 2.5rem;
+  padding: 0.95rem 2.2rem;
   border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.95rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
@@ -688,7 +725,8 @@ function handleMouseMove(e) {
 }
 
 .orbit:hover {
-  border-color: rgba(233, 69, 96, 0.3);
+  border-color: rgba(233, 69, 96, 0.5);
+  box-shadow: 0 0 30px rgba(233, 69, 96, 0.1);
 }
 
 .orbit-1 {
@@ -716,10 +754,10 @@ function handleMouseMove(e) {
 
 .orbit-node {
   position: absolute;
-  width: 48px;
-  height: 48px;
-  background: var(--ink-light);
-  border: 2px solid var(--accent);
+  width: 52px;
+  height: 52px;
+  background: rgba(22, 33, 62, 0.95);
+  border: 1.5px solid rgba(233, 69, 96, 0.4);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -727,8 +765,9 @@ function handleMouseMove(e) {
   color: white;
   font-size: 0.75rem;
   font-weight: 600;
-  box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0 0 25px rgba(233, 69, 96, 0.2), inset 0 0 15px rgba(233, 69, 96, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(5px);
 }
 
 .orbit-node:hover {
@@ -782,9 +821,9 @@ function handleMouseMove(e) {
 
 .center-hub {
   position: absolute;
-  width: 140px;
-  height: 140px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-warm));
+  width: 130px;
+  height: 130px;
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -793,8 +832,9 @@ function handleMouseMove(e) {
   color: white;
   font-family: 'Noto Serif SC', serif;
   font-weight: 700;
-  box-shadow: 0 0 60px rgba(233, 69, 96, 0.5);
-  transition: all 0.3s ease;
+  box-shadow: 0 0 80px rgba(233, 69, 96, 0.4), 0 0 120px rgba(233, 69, 96, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
 }
 
 .center-hub:hover {
@@ -810,16 +850,18 @@ function handleMouseMove(e) {
 /* Scroll Indicator */
 .scroll-indicator {
   position: absolute;
-  bottom: 2rem;
+  bottom: 2.5rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
-  animation: fadeInUp 1s ease infinite;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: fadeInUp 2s ease infinite;
   z-index: 3;
 }
 
@@ -855,10 +897,12 @@ function handleMouseMove(e) {
 
 /* Stats Bar */
 .stats-bar {
-  background: var(--ink-light);
-  padding: 4rem;
+  background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+  padding: 5rem 4rem;
   position: relative;
   z-index: 10;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .stats-grid {
@@ -907,15 +951,16 @@ function handleMouseMove(e) {
 
 .section-label {
   display: inline-block;
-  background: rgba(233, 69, 96, 0.1);
+  background: rgba(233, 69, 96, 0.08);
   color: var(--accent);
-  padding: 0.5rem 1.5rem;
+  padding: 0.4rem 1.2rem;
   border-radius: 30px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   text-transform: uppercase;
+  border: 1px solid rgba(233, 69, 96, 0.15);
 }
 
 .section-title {
@@ -954,9 +999,16 @@ function handleMouseMove(e) {
   padding: 3rem 2rem;
   text-align: center;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid var(--stone);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+}
+
+.role-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12), 0 10px 30px rgba(233, 69, 96, 0.08);
+  border-color: rgba(233, 69, 96, 0.2);
 }
 
 .role-card::before {
@@ -971,14 +1023,7 @@ function handleMouseMove(e) {
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.role-card:hover {
-  transform: translateY(-15px);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-}
 
-.role-card:hover::before {
-  transform: scaleX(1);
-}
 
 .role-glow {
   position: absolute;
@@ -1072,10 +1117,11 @@ function handleMouseMove(e) {
   content: '';
   position: absolute;
   top: 50px;
-  left: 10%;
-  right: 10%;
+  left: 8%;
+  right: 8%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background: linear-gradient(90deg, transparent 0%, rgba(233, 69, 96, 0.3) 20%, var(--accent) 50%, rgba(233, 69, 96, 0.3) 80%, transparent 100%);
+  z-index: 0;
 }
 
 .step {
@@ -1158,8 +1204,9 @@ function handleMouseMove(e) {
 }
 
 .tool-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 5px 20px rgba(233, 69, 96, 0.06);
+  border-color: rgba(233, 69, 96, 0.15);
 }
 
 .tool-card:hover::before {
@@ -1239,7 +1286,10 @@ function handleMouseMove(e) {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at center, rgba(233, 69, 96, 0.2) 0%, transparent 70%);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(233, 69, 96, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(116, 185, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 50%, rgba(244, 162, 97, 0.08) 0%, transparent 50%);
 }
 
 .cta-content {
@@ -1351,5 +1401,13 @@ function handleMouseMove(e) {
   .cta-section h2 {
     font-size: 2rem;
   }
+}
+
+/* 确保 GSAP 动画元素在动画未播放时仍然可见 */
+.hero-buttons a,
+.orbit,
+.orbit-node,
+.center-hub {
+  will-change: transform, opacity;
 }
 </style>

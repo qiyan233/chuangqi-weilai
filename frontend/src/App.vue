@@ -16,28 +16,35 @@ const { scrollProgress } = useLenis()
 
 const router = useRouter()
 
-// 页面转场动画
+// 页面转场动画 — 在 onMounted 之前注册，确保初始导航也受保护
+router.beforeEach((to, from, next) => {
+  // 初次加载时不触发转场（from 为空）
+  if (!from.name) {
+    next()
+    return
+  }
+  const content = document.querySelector('.main-content')
+  if (content) {
+    gsap.to(content, {
+      opacity: 0,
+      y: 20,
+      duration: 0.3,
+      onComplete: () => {
+        next()
+        gsap.fromTo(
+          content,
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+        )
+      },
+    })
+  } else {
+    next()
+  }
+})
+
 onMounted(() => {
-  router.beforeEach((to, from, next) => {
-    const content = document.querySelector('.main-content')
-    if (content) {
-      gsap.to(content, {
-        opacity: 0,
-        y: 20,
-        duration: 0.3,
-        onComplete: () => {
-          next()
-          gsap.fromTo(
-            content,
-            { opacity: 0, y: -20 },
-            { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
-          )
-        },
-      })
-    } else {
-      next()
-    }
-  })
+  // Lenis 已在 useLenis composable 中通过 onMounted 初始化
 })
 </script>
 

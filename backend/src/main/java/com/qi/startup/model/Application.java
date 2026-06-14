@@ -25,6 +25,9 @@ public class Application {
     @JoinColumn(name = "project_id")
     private Project project;
 
+    @Transient
+    private Long projectId;
+
     @Column(name = "team_members", columnDefinition = "TEXT")
     private String teamMembers;
 

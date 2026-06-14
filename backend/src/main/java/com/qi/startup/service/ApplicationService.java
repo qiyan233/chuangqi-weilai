@@ -1,8 +1,10 @@
 package com.qi.startup.service;
 
 import com.qi.startup.model.Application;
+import com.qi.startup.model.Project;
 import com.qi.startup.model.User;
 import com.qi.startup.repository.ApplicationRepository;
+import com.qi.startup.repository.ProjectRepository;
 import com.qi.startup.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     public List<Application> getApplicationsByUserId(Long userId) {
         User user = userRepository.findById(userId)
@@ -38,6 +41,14 @@ public class ApplicationService {
             .orElseThrow(() -> new RuntimeException("用户不存在"));
         application.setUser(user);
         application.setStatus(Application.ApplicationStatus.PENDING);
+        if (application.getProjectId() != null) {
+            Project project = projectRepository.findById(application.getProjectId())
+                .orElseThrow(() -> new RuntimeException("项目不存在"));
+            if (!project.getUser().getId().equals(userId)) {
+                throw new RuntimeException("无权为此项目提交申请");
+            }
+            application.setProject(project);
+        }
         return applicationRepository.save(application);
     }
 
@@ -56,5 +67,17 @@ public class ApplicationService {
 
     public long getPendingApplicationCount() {
         return applicationRepository.countByStatus(Application.ApplicationStatus.PENDING);
+    }
+
+    public long getTotalApplicationCount() {
+        return applicationRepository.count();
+    }
+
+    public long getApprovedApplicationCount() {
+        return applicationRepository.countByStatus(Application.ApplicationStatus.APPROVED);
+    }
+
+    public long getRejectedApplicationCount() {
+        return applicationRepository.countByStatus(Application.ApplicationStatus.REJECTED);
     }
 }

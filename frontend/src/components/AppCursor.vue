@@ -8,9 +8,35 @@ const cursorText = ref('')
 const isHovering = ref(false)
 const isClicking = ref(false)
 const isTextVisible = ref(false)
+const hasMoved = ref(false)
 
 onMounted(() => {
+  // Initialize cursor to screen center to avoid flying in from (0,0)
+  gsap.set(cursor.value, {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  })
+  gsap.set(cursorDot.value, {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  })
+
+  // Fallback: show cursor after 1.5s even without mouse movement
+  const fallbackTimer = setTimeout(() => {
+    if (!hasMoved.value) {
+      gsap.to('.cursor, .cursor-dot', { opacity: 1, duration: 0.3 })
+    }
+  }, 1500)
+
   const handleMouseMove = (e) => {
+    if (!hasMoved.value) {
+      hasMoved.value = true
+      // Snap to mouse position on first move, then fade in
+      gsap.set(cursor.value, { x: e.clientX, y: e.clientY })
+      gsap.set(cursorDot.value, { x: e.clientX, y: e.clientY })
+      gsap.to('.cursor, .cursor-dot', { opacity: 1, duration: 0.2 })
+    }
+
     gsap.to(cursor.value, {
       x: e.clientX,
       y: e.clientY,
@@ -74,6 +100,7 @@ onMounted(() => {
   document.addEventListener('mouseout', handleMouseLeaveLink)
 
   onUnmounted(() => {
+    clearTimeout(fallbackTimer)
     window.removeEventListener('mousemove', handleMouseMove)
     window.removeEventListener('mousedown', handleMouseDown)
     window.removeEventListener('mouseup', handleMouseUp)
@@ -125,7 +152,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  mix-blend-mode: difference;
+  opacity: 0;
 }
 
 .cursor--hover {
@@ -171,6 +198,7 @@ onMounted(() => {
   background: var(--accent);
   border-radius: 50%;
   pointer-events: none;
+  opacity: 0;
 }
 
 /* 在触摸设备上隐藏自定义光标 */
