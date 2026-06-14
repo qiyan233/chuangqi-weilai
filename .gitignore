@@ -1,0 +1,23 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+backend/target/
+backend/*.db
+backend/*.db-journal
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+
+# Logs
+*.log

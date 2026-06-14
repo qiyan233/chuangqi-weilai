@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具赋能 - 创启未来</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a2e;
+            --ink-light: #16213e;
+            --accent: #e94560;
+            --accent-warm: #ff6b6b;
+            --gold: #f4a261;
+            --cream: #faf8f5;
+            --stone: #e8e4df;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --success: #00b894;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo span { color: var(--accent); }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover { color: white; }
+        .nav-links a:hover::after { width: 100%; }
+
+        .nav-cta {
+            background: var(--accent);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent-warm);
+            transform: translateY(-2px);
+        }
+
+        /* Hero */
+        .page-hero {
+            background: var(--ink);
+            padding: 8rem 4rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(233, 69, 96, 0.15) 0%, transparent 70%);
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page-hero h1 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .page-hero p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        /* Tools Grid */
+        .tools-section {
+            padding: 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent);
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.2rem;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--stone);
+            transition: all 0.3s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .tool-card h3 {
+            font-size: 1.2rem;
+            color: var(--ink);
+        }
+
+        .tool-card ul {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-card li {
+            padding: 0.5rem 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .tool-card li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .tool-btn {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tool-btn:hover {
+            background: var(--accent-warm);
+            transform: translateY(-2px);
+        }
+
+        /* BP Structure Section */
+        .bp-section {
+            background: var(--ink);
+            padding: 5rem 4rem;
+        }
+
+        .bp-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bp-section .section-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .bp-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .bp-step {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .bp-step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .bp-step-content {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .bp-step-content h4 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bp-step-content p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Funding Compare */
+        .compare-section {
+            padding: 5rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .compare-table th {
+            background: var(--ink);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .compare-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--stone);
+            background: white;
+        }
+
+        .compare-table tr:hover td {
+            background: var(--cream);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0f0f1a;
+            padding: 4rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .footer-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-family: 'Noto Serif SC', serif;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand h3 span { color: var(--accent); }
+        .footer-brand p { line-height: 1.7; font-size: 0.9rem; }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 0.75rem; }
+
+        .footer-col a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover { color: var(--accent); }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) {
+            .nav { padding: 1rem 1.5rem; }
+            .nav-links { display: none; }
+            .page-hero { padding: 6rem 1.5rem 3rem; }
+            .page-hero h1 { font-size: 2rem; }
+            .tools-section { padding: 2rem 1.5rem; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .bp-section { padding: 3rem 1.5rem; }
+            .compare-section { padding: 3rem 1.5rem; }
+            .compare-table { font-size: 0.85rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="index.html" class="nav-logo">
+            <span>创</span>启未来
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">首页</a></li>
+            <li><a href="startup.html">创业者入驻</a></li>
+            <li><a href="investor.html">投资人/合作伙伴</a></li>
+            <li><a href="tools.html">工具赋能</a></li>
+            <li><a href="cases.html">成功案例</a></li>
+        </ul>
+        <a href="startup.html" class="nav-cta">立即申请</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="page-hero">
+        <div class="page-hero-content">
+            <h1>创业工具箱</h1>
+            <p>从BP撰写到财务预测，从市场分析到路演准备，提供全链条创业工具支持，让创业更高效</p>
+        </div>
+    </section>
+
+    <!-- Tools -->
+    <section class="tools-section">
+        <div class="section-header">
+            <span class="section-label">工具赋能</span>
+            <h2 class="section-title">全链条创业工具</h2>
+        </div>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon" style="background: rgba(233,69,96,0.1);">📄</div>
+                    <h3>BP工具</h3>
+                </div>
+                <ul>
+                    <li>BP模板下载（七大核心页面结构）</li>
+                    <li>在线编辑器，实时协作</li>
+                    <li>BP自检清单与评分工具</li>
+                    <li>投资人视角优化建议</li>
+                </ul>
+                <a href="#" class="tool-btn">立即使用</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon" style="background: rgba(0,184,148,0.1);">📊</div>
+                    <h3>财务工具</h3>
+                </div>
+                <ul>
+                    <li>财务模型模板（3-5年预测）</li>
+                    <li>估值计算器（多种方法）</li>
+                    <li>LTV/CAC计算器</li>
+                    <li>烧钱率与 runway 计算器</li>
+                </ul>
+                <a href="#" class="tool-btn">立即使用</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon" style="background: rgba(116,185,255,0.1);">🔍</div>
+                    <h3>市场分析</h3>
+                </div>
+                <ul>
+                    <li>行业报告数据库</li>
+                    <li>竞品分析模板</li>
+                    <li>市场规模计算器（TAM/SAM/SOM）</li>
+                    <li>用户画像生成器</li>
+                </ul>
+                <a href="#" class="tool-btn">立即使用</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon" style="background: rgba(244,162,97,0.1);">🎯</div>
+                    <h3>匹配工具</h3>
+                </div>
+                <ul>
+                    <li>项目-投资人智能匹配</li>
+                    <li>政策-企业匹配推荐</li>
+                    <li>孵化器适配度评估</li>
+                    <li>导师领域匹配</li>
+                </ul>
+                <a href="#" class="tool-btn">立即使用</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon" style="background: rgba(162,155,254,0.1);">✅</div>
+                    <h3>评估工具</h3>
+                </div>
+                <ul>
+                    <li>项目在线评估问卷</li>
+                    <li>创业 readiness 评估</li>
+                    <li>投资人六大维度评估</li>
+                    <li>团队能力矩阵分析</li>
+                </ul>
+                <a href="#" class="tool-btn">立即使用</a>
+            </div>
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon" style="background: rgba(253,203,110,0.1);">🎤</div>
+                    <h3>路演工具</h3>
+                </div>
+                <ul>
+                    <li>路演PPT模板库</li>
+                    <li>路演日程管理</li>
+                    <li>Q&A预判与准备</li>
+                    <li>路演视频录制与回放</li>
+                </ul>
+                <a href="#" class="tool-btn">立即使用</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- BP Structure -->
+    <section class="bp-section">
+        <div class="bp-container">
+            <div class="section-header">
+                <span class="section-label" style="background: rgba(233,69,96,0.2); color: var(--accent-warm);">BP指南</span>
+                <h2 class="section-title">商业计划书七大核心页面</h2>
+            </div>
+            <div class="bp-timeline">
+                <div class="bp-step">
+                    <div class="bp-step-number">1</div>
+                    <div class="bp-step-content">
+                        <h4>市场空间与痛点机会</h4>
+                        <p>行业规模、真实痛点、数据论证。用数据说话，证明这是一个值得投入的大市场。</p>
+                    </div>
+                </div>
+                <div class="bp-step">
+                    <div class="bp-step-number">2</div>
+                    <div class="bp-step-content">
+                        <h4>团队背景与分工能力</h4>
+                        <p>角色+贡献、互补性、背书资源。投资人投的是人，展示团队执行力与专业度。</p>
+                    </div>
+                </div>
+                <div class="bp-step">
+                    <div class="bp-step-number">3</div>
+                    <div class="bp-step-content">
+                        <h4>产品/服务核心价值</h4>
+                        <p>独特性、竞品对比、可量化结果。清晰传达产品解决了什么问题，为什么是你的团队能做。</p>
+                    </div>
+                </div>
+                <div class="bp-step">
+                    <div class="bp-step-number">4</div>
+                    <div class="bp-step-content">
+                        <h4>商业模式（盈利闭环）</h4>
+                        <p>收入来源、成本结构、渠道。展示清晰的盈利路径和可持续的商业模式。</p>
+                    </div>
+                </div>
+                <div class="bp-step">
+                    <div class="bp-step-number">5</div>
+                    <div class="bp-step-content">
+                        <h4>财务预测（真实可验证）</h4>
+                        <p>3年收入/成本/现金流预测、关键假设。数据要真实，假设要合理，经得起拷问。</p>
+                    </div>
+                </div>
+                <div class="bp-step">
+                    <div class="bp-step-number">6</div>
+                    <div class="bp-step-content">
+                        <h4>融资计划与用途分解</h4>
+                        <p>金额、用途明细、里程碑指标。让投资人清楚知道钱会花在哪里，能产生什么价值。</p>
+                    </div>
+                </div>
+                <div class="bp-step">
+                    <div class="bp-step-number">7</div>
+                    <div class="bp-step-content">
+                        <h4>退出逻辑</h4>
+                        <p>并购/IPO/回购路径、同赛道退出案例。给投资人一个清晰的退出预期和回报路径。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Funding Compare -->
+    <section class="compare-section">
+        <div class="section-header">
+            <span class="section-label">融资指南</span>
+            <h2 class="section-title">融资方式对比</h2>
+        </div>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>融资方式</th>
+                    <th>适用阶段</th>
+                    <th>特点</th>
+                    <th>典型规模</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>天使投资</strong></td>
+                    <td>种子/天使轮</td>
+                    <td>金额小、决策快，个人投资者为主</td>
+                    <td>100-500万</td>
+                </tr>
+                <tr>
+                    <td><strong>风险投资(VC)</strong></td>
+                    <td>A轮及以后</td>
+                    <td>金额大、要求高，专业投资机构</td>
+                    <td>1000万-数亿</td>
+                </tr>
+                <tr>
+                    <td><strong>众筹</strong></td>
+                    <td>早期验证</td>
+                    <td>门槛低，可验证市场需求</td>
+                    <td>10-100万</td>
+                </tr>
+                <tr>
+                    <td><strong>政府补助</strong></td>
+                    <td>各阶段</td>
+                    <td>无稀释、流程长，政策导向</td>
+                    <td>10-500万</td>
+                </tr>
+                <tr>
+                    <td><strong>战略投资</strong></td>
+                    <td>B轮及以后</td>
+                    <td>产业资源协同，可能有业务绑定</td>
+                    <td>数千万-数亿</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3><span>创</span>启未来</h3>
+                <p>大学初创团队孵化器与融资平台，致力于连接创业者、孵化器与投资人，打造一站式创业服务生态。</p>
+            </div>
+            <div class="footer-col">
+                <h4>平台服务</h4>
+                <ul>
+                    <li><a href="startup.html">创业者入驻</a></li>
+                    <li><a href="investor.html">投资人对接</a></li>
+                    <li><a href="tools.html">工具赋能</a></li>
+                    <li><a href="cases.html">成功案例</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>支持资源</h4>
+                <ul>
+                    <li><a href="#">创业导师</a></li>
+                    <li><a href="#">政策资讯</a></li>
+                    <li><a href="#">活动日历</a></li>
+                    <li><a href="#">帮助中心</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>关于我们</h4>
+                <ul>
+                    <li><a href="#">平台介绍</a></li>
+                    <li><a href="#">合作伙伴</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><a href="#">隐私政策</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p> 2026 创启未来 - 大学初创团队孵化器与融资平台. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

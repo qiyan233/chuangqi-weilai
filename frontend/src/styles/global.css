@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --ink: #1a1a2e;
+  --ink-light: #16213e;
+  --accent: #e94560;
+  --accent-warm: #ff6b6b;
+  --gold: #f4a261;
+  --cream: #faf8f5;
+  --stone: #e8e4df;
+  --text: #2d3436;
+  --text-light: #636e72;
+  --success: #00b894;
+  --warning: #fdcb6e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 通用按钮样式 */
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--accent-warm);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  border-color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-label .required {
+  color: var(--accent);
+  margin-left: 2px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--stone);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  background: var(--cream);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* 卡片样式 */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid var(--stone);
+  transition: all 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* 标签样式 */
+.tag {
+  background: rgba(233, 69, 96, 0.1);
+  color: var(--accent);
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.tag-success {
+  background: rgba(0, 184, 148, 0.1);
+  color: var(--success);
+}
+
+.tag-warning {
+  background: rgba(253, 203, 110, 0.1);
+  color: #e17055;
+}
+
+/* 通用区块样式 */
+.section {
+  padding: 6rem 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-label {
+  display: inline-block;
+  background: rgba(233, 69, 96, 0.1);
+  color: var(--accent);
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+.section-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 2.5rem;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .section {
+    padding: 4rem 2rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 3rem 1.5rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+}
