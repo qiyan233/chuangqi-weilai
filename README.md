@@ -11,6 +11,18 @@
 [![GSAP](https://img.shields.io/badge/GSAP-3.15-88CE02?logo=greensock&logoColor=white)](https://gsap.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+<br/>
+
+### 🌐 在线体验
+
+<h1>
+  <a href="https://test.guyueqi.cc.cd/" target="_blank">
+    <strong>🔗 test.guyueqi.cc.cd</strong>
+  </a>
+</h1>
+
+> 🎯 点击上方链接，即刻体验完整平台功能
+
 </div>
 
 ---
