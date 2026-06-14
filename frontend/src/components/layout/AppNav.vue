@@ -69,6 +69,7 @@ onUnmounted(() => {
       <li><router-link to="/investor/projects" @click="mobileMenuOpen = false" data-cursor>项目大厅</router-link></li>
       <li><router-link to="/tools" @click="mobileMenuOpen = false" data-cursor>工具赋能</router-link></li>
       <li><router-link to="/cases" @click="mobileMenuOpen = false" data-cursor>成功案例</router-link></li>
+      <li v-if="authStore.isAdmin"><router-link to="/admin" @click="mobileMenuOpen = false" data-cursor class="admin-link">管理后台</router-link></li>
     </ul>
 
     <div class="nav-actions">
@@ -347,6 +348,34 @@ onUnmounted(() => {
     background: rgba(26, 26, 46, 0.98);
     padding: 1rem 2rem;
   }
+}
+
+/* Admin link — subtle accent indicator */
+.admin-link {
+  color: rgba(255, 215, 0, 0.85) !important;
+}
+
+.admin-link::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #ffd700;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  position: static;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+
+.admin-link:hover,
+.admin-link.router-link-active {
+  color: #ffd700 !important;
+}
+
+.admin-link:hover::before,
+.admin-link.router-link-active::before {
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
 /* Nav entrance safety — ensure visibility even if GSAP delays */

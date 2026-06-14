@@ -49,6 +49,30 @@ const routes = [
     name: 'Tools',
     component: () => import('@/views/Tools.vue'),
   },
+  {
+    path: '/admin',
+    name: 'AdminDashboard',
+    component: () => import('@/views/admin/Dashboard.vue'),
+    meta: { requiresAuth: true, role: 'ADMIN' },
+  },
+  {
+    path: '/admin/users',
+    name: 'AdminUsers',
+    component: () => import('@/views/admin/Users.vue'),
+    meta: { requiresAuth: true, role: 'ADMIN' },
+  },
+  {
+    path: '/admin/projects',
+    name: 'AdminProjects',
+    component: () => import('@/views/admin/Projects.vue'),
+    meta: { requiresAuth: true, role: 'ADMIN' },
+  },
+  {
+    path: '/admin/applications',
+    name: 'AdminApplications',
+    component: () => import('@/views/admin/Applications.vue'),
+    meta: { requiresAuth: true, role: 'ADMIN' },
+  },
 ]
 
 const router = createRouter({

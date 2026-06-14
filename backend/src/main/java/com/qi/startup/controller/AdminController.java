@@ -2,9 +2,11 @@ package com.qi.startup.controller;
 
 import com.qi.startup.model.Application;
 import com.qi.startup.model.Project;
+import com.qi.startup.model.User;
 import com.qi.startup.service.ApplicationService;
+import com.qi.startup.repository.UserRepository;
 import com.qi.startup.service.ProjectService;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,11 +21,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
-@RequiredArgsConstructor
 public class AdminController {
 
     private final ProjectService projectService;
     private final ApplicationService applicationService;
+    private final UserRepository userRepository;
+
+    public AdminController(ProjectService projectService,
+                           ApplicationService applicationService,
+                           UserRepository userRepository) {
+        this.projectService = projectService;
+        this.applicationService = applicationService;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getAdminStats() {
@@ -36,6 +46,10 @@ public class AdminController {
         stats.put("pendingApplications", applicationService.getPendingApplicationCount());
         stats.put("approvedApplications", applicationService.getApprovedApplicationCount());
         stats.put("rejectedApplications", applicationService.getRejectedApplicationCount());
+        stats.put("totalUsers", userRepository.count());
+        stats.put("entrepreneurCount", userRepository.countByRole(User.UserRole.ENTREPRENEUR));
+        stats.put("investorCount", userRepository.countByRole(User.UserRole.INVESTOR));
+        stats.put("adminCount", userRepository.countByRole(User.UserRole.ADMIN));
         return ResponseEntity.ok(stats);
     }
 
@@ -70,8 +84,10 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> reviewApplication(
             @PathVariable Long id,
             @RequestParam String status,
-            @RequestParam(required = false) String reviewNotes) {
-        Application application = applicationService.reviewApplication(id, status, reviewNotes, null);
+            @RequestParam(required = false) String reviewNotes,
+            HttpServletRequest request) {
+        Long reviewerId = (Long) request.getAttribute("userId");
+        Application application = applicationService.reviewApplication(id, status, reviewNotes, reviewerId);
         return ResponseEntity.ok(toApplicationRow(application));
     }
 

@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/projects/{id}").permitAll()
                 .requestMatchers("/api/stats/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
                 .requestMatchers("/api/projects/*/review").hasRole("ADMIN")
                 .requestMatchers("/api/applications/*/review").hasRole("ADMIN")
                 .requestMatchers("/api/applications").hasRole("ADMIN")

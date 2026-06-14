@@ -72,6 +72,12 @@ public class Project {
     @Column(name = "equity_percent", length = 20)
     private String equityPercent;
 
+    @Column(name = "review_notes", columnDefinition = "TEXT")
+    private String reviewNotes;
+
+    @Column(name = "reviewed_at")
+    private LocalDateTime reviewedAt;
+
     @Column(name = "fund_usage", columnDefinition = "TEXT")
     private String fundUsage;
 
