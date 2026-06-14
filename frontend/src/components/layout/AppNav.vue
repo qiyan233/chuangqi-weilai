@@ -2,11 +2,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const scrolled = ref(false)
 const mobileMenuOpen = ref(false)
+const navRef = ref(null)
 
 function handleScroll() {
   scrolled.value = window.scrollY > 50
@@ -19,6 +22,25 @@ function logout() {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+
+  // 导航栏入场动画
+  gsap.from(navRef.value, {
+    y: -100,
+    opacity: 0,
+    duration: 1,
+    ease: 'power3.out',
+    delay: 0.5,
+  })
+
+  // 导航链接交错动画
+  gsap.from('.nav-links li', {
+    y: -20,
+    opacity: 0,
+    duration: 0.6,
+    stagger: 0.1,
+    ease: 'power2.out',
+    delay: 0.8,
+  })
 })
 
 onUnmounted(() => {
@@ -27,8 +49,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <nav class="nav" :class="{ scrolled }">
-    <router-link to="/" class="nav-logo">
+  <nav ref="navRef" class="nav" :class="{ scrolled }">
+    <router-link to="/" class="nav-logo" data-cursor data-cursor-text="Home">
       <span class="logo-highlight">创</span>启未来
     </router-link>
 
@@ -39,11 +61,11 @@ onUnmounted(() => {
     </button>
 
     <ul class="nav-links" :class="{ open: mobileMenuOpen }">
-      <li><router-link to="/" @click="mobileMenuOpen = false">首页</router-link></li>
-      <li><router-link to="/startup/apply" @click="mobileMenuOpen = false">创业者入驻</router-link></li>
-      <li><router-link to="/investor/projects" @click="mobileMenuOpen = false">项目大厅</router-link></li>
-      <li><router-link to="/tools" @click="mobileMenuOpen = false">工具赋能</router-link></li>
-      <li><router-link to="/cases" @click="mobileMenuOpen = false">成功案例</router-link></li>
+      <li><router-link to="/" @click="mobileMenuOpen = false" data-cursor>首页</router-link></li>
+      <li><router-link to="/startup/apply" @click="mobileMenuOpen = false" data-cursor>创业者入驻</router-link></li>
+      <li><router-link to="/investor/projects" @click="mobileMenuOpen = false" data-cursor>项目大厅</router-link></li>
+      <li><router-link to="/tools" @click="mobileMenuOpen = false" data-cursor>工具赋能</router-link></li>
+      <li><router-link to="/cases" @click="mobileMenuOpen = false" data-cursor>成功案例</router-link></li>
     </ul>
 
     <div class="nav-actions">
@@ -51,14 +73,15 @@ onUnmounted(() => {
         <router-link
           :to="authStore.isEntrepreneur ? '/startup/dashboard' : '/investor/dashboard'"
           class="nav-dashboard"
+          data-cursor
         >
           {{ authStore.user?.realName || authStore.user?.username }}
         </router-link>
-        <button class="nav-logout" @click="logout">退出</button>
+        <button class="nav-logout" @click="logout" data-cursor>退出</button>
       </template>
       <template v-else>
-        <router-link to="/login" class="nav-login">登录</router-link>
-        <router-link to="/register" class="nav-cta">注册</router-link>
+        <router-link to="/login" class="nav-login" data-cursor>登录</router-link>
+        <router-link to="/register" class="nav-cta" data-cursor data-cursor-text="注册">注册</router-link>
       </template>
     </div>
   </nav>
@@ -70,17 +93,18 @@ onUnmounted(() => {
   top: 0;
   width: 100%;
   z-index: 1000;
-  padding: 1rem 4rem;
+  padding: 1.5rem 4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav.scrolled {
   background: rgba(26, 26, 46, 0.95);
-  backdrop-filter: blur(20px);
-  padding: 0.8rem 4rem;
+  backdrop-filter: blur(20px) saturate(180%);
+  padding: 1rem 4rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .nav-logo {
@@ -92,10 +116,21 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.nav-logo:hover {
+  transform: scale(1.05);
 }
 
 .logo-highlight {
   color: var(--accent);
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.nav-logo:hover .logo-highlight {
+  transform: rotate(-10deg) scale(1.1);
 }
 
 .nav-links {
@@ -109,19 +144,21 @@ onUnmounted(() => {
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
   position: relative;
+  padding: 0.5rem 0;
 }
 
-.nav-links a::after {
+.nav-links a::before {
   content: '';
   position: absolute;
-  bottom: -4px;
-  left: 0;
+  bottom: 0;
+  left: 50%;
   width: 0;
   height: 2px;
   background: var(--accent);
-  transition: width 0.3s;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
 .nav-links a:hover,
@@ -129,9 +166,29 @@ onUnmounted(() => {
   color: white;
 }
 
-.nav-links a:hover::after,
-.nav-links a.router-link-active::after {
+.nav-links a:hover::before,
+.nav-links a.router-link-active::before {
   width: 100%;
+}
+
+/* 链接悬停时的光晕效果 */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(233, 69, 96, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+
+.nav-links a:hover::after {
+  width: 100px;
+  height: 100px;
 }
 
 .nav-actions {
@@ -145,11 +202,14 @@ onUnmounted(() => {
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
 .nav-login:hover {
   color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-cta {
@@ -160,12 +220,30 @@ onUnmounted(() => {
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .nav-cta:hover {
   background: var(--accent-warm);
   transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+}
+
+.nav-cta:hover::before {
+  left: 100%;
 }
 
 .nav-dashboard {
@@ -173,11 +251,14 @@ onUnmounted(() => {
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
 .nav-dashboard:hover {
   color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-logout {
@@ -187,12 +268,13 @@ onUnmounted(() => {
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.8rem;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .nav-logout:hover {
   color: white;
   border-color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .mobile-menu-btn {
@@ -210,7 +292,7 @@ onUnmounted(() => {
   width: 24px;
   height: 2px;
   background: white;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 @media (max-width: 1024px) {
@@ -233,9 +315,10 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     background: rgba(26, 26, 46, 0.98);
+    backdrop-filter: blur(20px);
     flex-direction: column;
     padding: 1rem 2rem;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .nav-links.open {

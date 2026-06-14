@@ -1,4 +1,36 @@
 <script setup>
+import { onMounted } from 'vue'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+onMounted(() => {
+  // 页脚渐入动画
+  gsap.from('.footer', {
+    opacity: 0,
+    y: 50,
+    duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: '.footer',
+      start: 'top 90%',
+      toggleActions: 'play none none reverse',
+    },
+  })
+
+  // 列交错动画
+  gsap.from('.footer-col', {
+    opacity: 0,
+    y: 30,
+    duration: 0.8,
+    stagger: 0.15,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '.footer-grid',
+      start: 'top 85%',
+      toggleActions: 'play none none reverse',
+    },
+  })
+})
 </script>
 
 <template>
@@ -7,37 +39,53 @@
       <div class="footer-brand">
         <h3><span class="logo-highlight">创</span>启未来</h3>
         <p>大学初创团队孵化器与融资平台，致力于连接创业者、孵化器与投资人，打造一站式创业服务生态。</p>
+        <div class="social-links">
+          <a href="#" class="social-link" data-cursor data-cursor-text="微信">
+            <span>微</span>
+          </a>
+          <a href="#" class="social-link" data-cursor data-cursor-text="微博">
+            <span>博</span>
+          </a>
+          <a href="#" class="social-link" data-cursor data-cursor-text="知乎">
+            <span>知</span>
+          </a>
+        </div>
       </div>
       <div class="footer-col">
         <h4>平台服务</h4>
         <ul>
-          <li><router-link to="/startup/apply">创业者入驻</router-link></li>
-          <li><router-link to="/investor/projects">投资人对接</router-link></li>
-          <li><router-link to="/tools">工具赋能</router-link></li>
-          <li><router-link to="/cases">成功案例</router-link></li>
+          <li><router-link to="/startup/apply" data-cursor>创业者入驻</router-link></li>
+          <li><router-link to="/investor/projects" data-cursor>投资人对接</router-link></li>
+          <li><router-link to="/tools" data-cursor>工具赋能</router-link></li>
+          <li><router-link to="/cases" data-cursor>成功案例</router-link></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>支持资源</h4>
         <ul>
-          <li><a href="#">创业导师</a></li>
-          <li><a href="#">政策资讯</a></li>
-          <li><a href="#">活动日历</a></li>
-          <li><a href="#">帮助中心</a></li>
+          <li><a href="#" data-cursor>创业导师</a></li>
+          <li><a href="#" data-cursor>政策资讯</a></li>
+          <li><a href="#" data-cursor>活动日历</a></li>
+          <li><a href="#" data-cursor>帮助中心</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>关于我们</h4>
         <ul>
-          <li><a href="#">平台介绍</a></li>
-          <li><a href="#">合作伙伴</a></li>
-          <li><a href="#">联系我们</a></li>
-          <li><a href="#">隐私政策</a></li>
+          <li><a href="#" data-cursor>平台介绍</a></li>
+          <li><a href="#" data-cursor>合作伙伴</a></li>
+          <li><a href="#" data-cursor>联系我们</a></li>
+          <li><a href="#" data-cursor>隐私政策</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <p>&copy; 2026 创启未来 - 大学初创团队孵化器与融资平台. All rights reserved.</p>
+      <div class="footer-badges">
+        <span class="badge">Vue 3</span>
+        <span class="badge">Spring Boot</span>
+        <span class="badge">SQLite</span>
+      </div>
     </div>
   </footer>
 </template>
@@ -45,8 +93,20 @@
 <style scoped>
 .footer {
   background: #0f0f1a;
-  padding: 4rem;
+  padding: 6rem 4rem 4rem;
   color: rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
 .footer-grid {
@@ -54,29 +114,79 @@
   margin: 0 auto;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 3rem;
+  gap: 4rem;
 }
 
 .footer-brand h3 {
   font-family: 'Noto Serif SC', serif;
   color: white;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
 }
 
 .logo-highlight {
   color: var(--accent);
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.footer-brand h3:hover .logo-highlight {
+  transform: rotate(-10deg);
 }
 
 .footer-brand p {
-  line-height: 1.7;
-  font-size: 0.9rem;
+  line-height: 1.8;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-3px);
 }
 
 .footer-col h4 {
   color: white;
   font-size: 1rem;
   margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.footer-col h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.footer-col:hover h4::after {
+  width: 50px;
 }
 
 .footer-col ul {
@@ -91,35 +201,72 @@
   color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .footer-col a:hover {
   color: var(--accent);
+  transform: translateX(5px);
 }
 
 .footer-bottom {
   max-width: 1400px;
-  margin: 3rem auto 0;
+  margin: 4rem auto 0;
   padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.85rem;
+}
+
+.footer-badges {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.badge {
+  padding: 0.3rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.badge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 @media (max-width: 1024px) {
   .footer-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
   }
 }
 
 @media (max-width: 640px) {
   .footer {
-    padding: 3rem 1.5rem;
+    padding: 4rem 1.5rem 3rem;
   }
 
   .footer-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-badges {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
 </style>
