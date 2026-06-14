@@ -40,7 +40,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(request -> {
                 var config = new org.springframework.web.cors.CorsConfiguration();
                 config.setAllowCredentials(true);
-                config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173"));
+                config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:3001", "http://localhost:5173"));
                 config.setAllowedHeaders(Arrays.asList("*"));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setMaxAge(3600L);
